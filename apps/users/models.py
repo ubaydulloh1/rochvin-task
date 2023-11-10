@@ -13,6 +13,12 @@ class User(AbstractUser):
     def __str__(self):
         return f"{self.pk}. {self.username}"
 
+    def is_employee(self):
+        return hasattr(self, 'employee')
+
+    def is_client(self):
+        return hasattr(self, 'client')
+
 
 class Employee(BaseModel):
     class Meta:
