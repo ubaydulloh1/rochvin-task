@@ -48,10 +48,10 @@ class Order(BaseModel):
         decimal_places=2,
         help_text=_("Total price in sum.")
     )
-    order_date = models.DateField(verbose_name=_("Order date"), auto_now_add=True)
+    ordered_at = models.DateTimeField(verbose_name=_("Ordered at"), auto_now_add=True, null=True)
 
     def __str__(self):
-        return f"{self.pk}. {self.client.get_full_name()} -> {self.order_date}"
+        return f"{self.pk}. {self.client.get_full_name()} -> {self.ordered_at}"
 
 
 class OrderProduct(BaseModel):

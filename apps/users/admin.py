@@ -21,6 +21,7 @@ class ClientAdmin(admin.ModelAdmin):
     list_display = ("pk", "user", "first_name", "last_name", "middle_name", "created_at",)
     list_display_links = ("pk", "user")
     search_fields = ("user__username", "user__email", "first_name", "last_name", "middle_name")
+    autocomplete_fields = ("user",)
 
 
 @admin.register(models.Employee)
@@ -28,3 +29,4 @@ class EmployeeAdmin(admin.ModelAdmin):
     list_display = ("pk", "user", "first_name", "last_name", "middle_name", "created_at",)
     list_display_links = ("pk", "user")
     search_fields = ("user__username", "user__email", "first_name", "last_name", "middle_name")
+    autocomplete_fields = ("user",)

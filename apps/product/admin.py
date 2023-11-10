@@ -32,7 +32,7 @@ class OrderAdmin(admin.ModelAdmin):
         'client',
         'employee',
         'total_price',
-        'order_date',
+        'ordered_at',
     )
     list_display_links = (
         'pk',
@@ -43,6 +43,11 @@ class OrderAdmin(admin.ModelAdmin):
         'client__last_name',
         'employee__first_name',
         'employee__last_name',
+    )
+    autocomplete_fields = (
+        'client',
+        'employee',
+        'products',
     )
     inlines = (
         OrderProductInline,
