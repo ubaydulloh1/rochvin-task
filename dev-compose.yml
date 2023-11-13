@@ -1,0 +1,45 @@
+version: '3.8'
+
+networks:
+  default:
+    name: ${COMPOSE_PROJECT_NAME}_network
+    driver: bridge
+
+services:
+  django:
+    image: rochvin-task:latest
+    build:
+      context: .
+    container_name: ${COMPOSE_PROJECT_NAME}-django
+    volumes:
+      - ./:/app
+      - static_volume:/app/static
+      - media_volume:/app/media
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+    command: gunicorn core.wsgi:application --bind 0.0.0.0:${DJANGO_PORT}
+    ports:
+      - ${DJANGO_PORT}:${DJANGO_PORT}
+    restart: always
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: ${COMPOSE_PROJECT_NAME}-postgres
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_HOST: ${DB_HOST}
+      POSTGRES_PORT: ${DB_PORT}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    restart: always
+
+volumes:
+  postgres_data: { }
+  static_volume: { }
+  media_volume: { }
