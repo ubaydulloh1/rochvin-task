@@ -4,3 +4,4 @@ psycopg2-binary==2.9.9
 drf-yasg==1.21.7
 pillow==10.1.0
 python-environ==0.4.54
+factory_boy==3.3.0
