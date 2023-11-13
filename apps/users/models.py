@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
 from apps.base.models import BaseModel
+from . import querysets
 
 
 class User(AbstractUser):
@@ -32,6 +33,8 @@ class Employee(BaseModel):
     middle_name = models.CharField(verbose_name=_("Middle name"), max_length=200)
     birth_date = models.DateField(verbose_name=_("Birth date"))
 
+    objects = querysets.EmployeeQueryset.as_manager()
+
     def __str__(self):
         return f"{self.pk}. {self.get_full_name()}"
 
@@ -50,6 +53,8 @@ class Client(BaseModel):
     last_name = models.CharField(verbose_name=_("Last name"), max_length=200)
     middle_name = models.CharField(verbose_name=_("Middle name"), max_length=200)
     birth_date = models.DateField(verbose_name=_("Birth date"))
+
+    objects = querysets.ClientQueryset.as_manager()
 
     def __str__(self):
         return f"{self.pk}. {self.get_full_name()}"

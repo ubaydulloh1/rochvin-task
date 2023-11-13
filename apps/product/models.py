@@ -1,5 +1,9 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.core.exceptions import ValidationError
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
 from apps.base.models import BaseModel
 
 
@@ -46,12 +50,21 @@ class Order(BaseModel):
         verbose_name=_("Total price"),
         max_digits=20,
         decimal_places=2,
-        help_text=_("Total price in sum.")
+        help_text=_("Total price in sum."),
+        null=True
     )
     ordered_at = models.DateTimeField(verbose_name=_("Ordered at"), auto_now_add=True, null=True)
 
     def __str__(self):
         return f"{self.pk}. {self.client.get_full_name()} -> {self.ordered_at}"
+
+    def save(self, *args, **kwargs):
+        total_price = 0
+        if self.pk is not None:
+            for order_product in self.order_products.all():
+                total_price += order_product.product.price * order_product.quantity
+        self.total_price = total_price
+        return super().save(*args, **kwargs)
 
 
 class OrderProduct(BaseModel):
@@ -77,3 +90,27 @@ class OrderProduct(BaseModel):
 
     def __str__(self):
         return f"{self.pk}. {self.order} -> {self.product}"
+
+    def clean(self):
+        if self.pk is None and self.product.quantity < self.quantity:
+            raise ValidationError(
+                {
+                    'quantity': _(f'Quantity must be less than or equal to product quantity ({self.product.quantity}).')
+                }
+            )
+        return super().clean()
+
+    def save(self, *args, **kwargs):
+        self.product.quantity -= self.quantity
+        self.product.save()
+        return super().save(*args, **kwargs)
+
+
+@receiver(post_save, sender=OrderProduct)
+def update_total_price(sender, instance, created, **kwargs):
+    total_price = 0
+    for order_product in instance.order.order_products.all():
+        total_price += order_product.product.price * order_product.quantity
+
+    instance.order.total_price = total_price
+    instance.order.save()

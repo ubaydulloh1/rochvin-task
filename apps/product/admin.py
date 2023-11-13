@@ -52,3 +52,6 @@ class OrderAdmin(admin.ModelAdmin):
     inlines = (
         OrderProductInline,
     )
+    readonly_fields = (
+        'total_price',
+    )
